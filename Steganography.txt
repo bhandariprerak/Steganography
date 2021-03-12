@@ -1,0 +1,131 @@
+function crop(image,width,height){
+    var croppedimg = new SimpleImage(width,height);
+    for(var pixel of image.values()){
+        var x = pixel.getX();
+        var y = pixel.getY();
+        if(x<width && y<height){
+            var np = croppedimg.getPixel(x,y);
+            np.setRed(pixel.getRed());
+            np.setGreen(pixel.getGreen());
+            np.setBlue(pixel.getBlue());
+        }
+    }
+    return croppedimg;
+}
+
+
+
+function clearbits(pixel){
+    pixel = Math.floor(pixel/16)*16;
+    return pixel;
+}
+
+function chop2hide(image){
+    for(var pixel of image.values()){
+        pixel.setRed(clearbits(pixel.getRed()));
+        pixel.setGreen(clearbits(pixel.getGreen()));
+        pixel.setBlue(clearbits(pixel.getBlue()));
+    }
+    return image;
+}
+
+function shift(image){
+    for(var pixel of image.values()){
+        pixel.setRed(pixel.getRed()/16);
+        pixel.setGreen(pixel.getGreen()/16);
+        pixel.setBlue(pixel.getBlue()/16);
+    }
+    return image;
+}
+
+function combineCheck(p,q){
+    var ans = p+q;
+    if(ans>255){
+        print("Error: Answer too big");
+    }
+    return ans;
+}
+
+function combine(start,hide){
+    var finalimg = new SimpleImage(start.getWidth(),start.getHeight());
+    for(var pixel of finalimg.values()){
+        var x = pixel.getX();
+        var y = pixel.getY();
+        
+        var startpixel = start.getPixel(x,y);
+        var hidepixel = hide.getPixel(x,y);
+        
+        pixel.setRed(combineCheck(startpixel.getRed(),hidepixel.getRed()));
+        pixel.setGreen(combineCheck(startpixel.getGreen(),hidepixel.getGreen()));
+        pixel.setBlue(combineCheck(startpixel.getBlue(),hidepixel.getBlue()));
+    }
+    return finalimg;
+}
+
+function decryption(value){
+    value = Math.floor(value%16)*16;
+    return value;
+}
+
+function extraction(image){
+    var result = new SimpleImage(image.getWidth(),image.getHeight());
+    for(var pixel of result.values()){
+        var x = pixel.getX();
+        var y = pixel.getY();
+        var imagepixel = image.getPixel(x,y);
+        
+        pixel.setRed(decryption(imagepixel.getRed()));
+        pixel.setGreen(decryption(imagepixel.getGreen()));
+        pixel.setBlue(decryption(imagepixel.getBlue()));
+    }
+    return result;
+}
+
+var start = new SimpleImage("astrachan.jpg");
+print("Original image:",start);
+var hide = new SimpleImage("hilton.jpg");
+print("Image to hide:",hide);
+
+var cropWidth = start.getWidth();
+if(hide.getWidth() < cropWidth){
+    cropWidth = hide.getWidth();
+}
+
+var cropHeight = start.getHeight();
+if(hide.getHeight() < cropHeight){
+    cropHeight = hide.getHeight();
+}
+
+start = crop(start, cropWidth, cropHeight);
+print("Cropped Original Image:",start);
+hide = crop(hide, cropWidth, cropHeight);
+print("Cropped Image to Hide:",hide);
+
+start = chop2hide(start);
+hide = shift(hide);
+
+var msg = combine(start,hide);
+print("Altered Orignal Image:",msg);
+var decrypt = extraction(msg);
+print("Extracted Image:",decrypt);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
