@@ -108,24 +108,3 @@ var msg = combine(start,hide);
 print("Altered Orignal Image:",msg);
 var decrypt = extraction(msg);
 print("Extracted Image:",decrypt);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
